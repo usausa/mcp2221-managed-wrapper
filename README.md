@@ -1,1 +1,1 @@
-# mcp2221-interop
+# MCP2221ManagedWrapper

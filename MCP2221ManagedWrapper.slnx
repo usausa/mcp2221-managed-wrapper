@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Example/">
+  </Folder>
+  <Folder Name="/Library/">
+    <Project Path="MCP2221ManagedWrapper/MCP2221ManagedWrapper.csproj" Id="32ff568b-4858-42df-ab71-169999e69c75" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Analyzers.ruleset" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="LICENSE" />
+    <File Path="MCP2221ManagedWrapper.sln.DotSettings" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>
