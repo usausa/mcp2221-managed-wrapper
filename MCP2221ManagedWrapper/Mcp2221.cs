@@ -6,12 +6,6 @@ namespace MCP2221ManagedWrapper;
 // TODO static using NativeMethods
 public sealed unsafe class Mcp2221 : IDisposable
 {
-    private const int DescriptorMaxChars = 30;
-    private const int DescriptorBufferChars = DescriptorMaxChars + 1; // + null terminator
-
-    private const int LibraryVersionBufferChars = 64;
-    private const int RevisionBufferChars = 64;
-
     public IntPtr Handle { get; private set; }
 
     public bool IsOpen => Handle != IntPtr.Zero;
@@ -39,7 +33,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return new Mcp2221(NativeMethods.Mcp2221_OpenByIndex(vid, pid, index));
     }
 
-    // TODO
+    // TODO default VID/PID constants, 1st serial
     public static Mcp2221 OpenBySerialNumber(uint vid, uint pid, string serialNumber)
     {
         return new Mcp2221(NativeMethods.Mcp2221_OpenBySN(vid, pid, serialNumber));
@@ -66,12 +60,13 @@ public sealed unsafe class Mcp2221 : IDisposable
     // Library/Enumeration
     //------------------------------------------------------------------------
 
+    // TODO override ?
     public static Mcp2221Status GetConnectedDevices(uint vid, uint pid, out uint count)
         => (Mcp2221Status)NativeMethods.Mcp2221_GetConnectedDevices(vid, pid, out count);
 
     public static Mcp2221Status GetLibraryVersion(out string version)
     {
-        Span<char> buf = stackalloc char[LibraryVersionBufferChars];
+        Span<char> buf = stackalloc char[16];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -94,7 +89,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status GetManufacturerDescriptor(out string manufacturer)
     {
-        Span<char> buf = stackalloc char[DescriptorBufferChars];
+        Span<char> buf = stackalloc char[32];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -116,7 +111,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status GetProductDescriptor(out string product)
     {
-        Span<char> buf = stackalloc char[DescriptorBufferChars];
+        Span<char> buf = stackalloc char[32];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -138,7 +133,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status GetSerialNumberDescriptor(out string serial)
     {
-        Span<char> buf = stackalloc char[DescriptorBufferChars];
+        Span<char> buf = stackalloc char[32];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -160,7 +155,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status GetFactorySerialNumber(out string serial)
     {
-        Span<char> buf = stackalloc char[DescriptorBufferChars];
+        Span<char> buf = stackalloc char[32];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -179,8 +174,8 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status GetHwFwRevisions(out string hardwareRevision, out string firmwareRevision)
     {
-        Span<char> hw = stackalloc char[RevisionBufferChars];
-        Span<char> fw = stackalloc char[RevisionBufferChars];
+        Span<char> hw = stackalloc char[64];
+        Span<char> fw = stackalloc char[64];
         hw.Clear();
         fw.Clear();
 
@@ -306,17 +301,18 @@ public sealed unsafe class Mcp2221 : IDisposable
     //------------------------------------------------------------------------
 
     public Mcp2221Status SmbusWriteByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, byte data)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SmbusWriteByte(
+    {
+        return (Mcp2221Status)NativeMethods.Mcp2221_SmbusWriteByte(
             Handle,
             slaveAddress,
             use7BitAddress ? (byte)1 : (byte)0,
             usePec ? (byte)1 : (byte)0,
             command,
             data);
+    }
 
     public Mcp2221Status SmbusReadByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, out byte readByte)
     {
-        readByte = 0;
         fixed (byte* p = &readByte)
         {
             return (Mcp2221Status)NativeMethods.Mcp2221_SmbusReadByte(
@@ -412,12 +408,14 @@ public sealed unsafe class Mcp2221 : IDisposable
     }
 
     public Mcp2221Status SmbusSendByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte data)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SmbusSendByte(
+    {
+        return (Mcp2221Status)NativeMethods.Mcp2221_SmbusSendByte(
             Handle,
             slaveAddress,
             use7BitAddress ? (byte)1 : (byte)0,
             usePec ? (byte)1 : (byte)0,
             data);
+    }
 
     public Mcp2221Status SmbusReceiveByte(byte slaveAddress, bool use7BitAddress, bool usePec, out byte readByte)
     {
@@ -565,8 +563,8 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SendPassword(string password)
         => (Mcp2221Status)NativeMethods.Mcp2221_SendPassword(Handle, password);
 
-    public Mcp2221Status SetPermanentLock()
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetPermanentLock(Handle);
+    //public Mcp2221Status SetPermanentLock()
+    //    => (Mcp2221Status)NativeMethods.Mcp2221_SetPermanentLock(Handle);
 
     public static Mcp2221Status GetLastError()
         => (Mcp2221Status)NativeMethods.Mcp2221_GetLastError();
