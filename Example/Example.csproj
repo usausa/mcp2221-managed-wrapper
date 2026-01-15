@@ -10,4 +10,10 @@
     <ProjectReference Include="..\MCP2221ManagedWrapper\MCP2221ManagedWrapper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="mcp2221_dll_um_x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
