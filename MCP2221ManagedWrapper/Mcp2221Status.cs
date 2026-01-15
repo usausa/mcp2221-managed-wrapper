@@ -1,5 +1,6 @@
 namespace MCP2221ManagedWrapper;
 
+// ReSharper disable InconsistentNaming
 public enum Mcp2221Status
 {
     NoError = NativeMethods.E_NO_ERR,
@@ -44,3 +45,4 @@ public enum Mcp2221Status
     RawTxCopyFailed = NativeMethods.E_ERR_RAW_TX_COPYFAILED,
     RawRxCopyFailed = NativeMethods.E_ERR_RAW_RX_COPYFAILED
 }
+// ReSharper restore InconsistentNaming

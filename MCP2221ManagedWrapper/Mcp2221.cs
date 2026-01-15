@@ -3,12 +3,17 @@
 // ReSharper disable IdentifierTypo
 namespace MCP2221ManagedWrapper;
 
-// TODO static using NativeMethods
+using static MCP2221ManagedWrapper.NativeMethods;
+
 public sealed unsafe class Mcp2221 : IDisposable
 {
     public IntPtr Handle { get; private set; }
 
     public bool IsOpen => Handle != IntPtr.Zero;
+
+    //------------------------------------------------------------------------
+    // Constructor
+    //------------------------------------------------------------------------
 
     private Mcp2221(IntPtr handle)
     {
@@ -30,31 +35,29 @@ public sealed unsafe class Mcp2221 : IDisposable
     // TODO default VID/PID constants, 1st index
     public static Mcp2221 OpenByIndex(uint vid, uint pid, uint index)
     {
-        return new Mcp2221(NativeMethods.Mcp2221_OpenByIndex(vid, pid, index));
+        return new Mcp2221(Mcp2221_OpenByIndex(vid, pid, index));
     }
 
     // TODO default VID/PID constants, 1st serial
     public static Mcp2221 OpenBySerialNumber(uint vid, uint pid, string serialNumber)
     {
-        return new Mcp2221(NativeMethods.Mcp2221_OpenBySN(vid, pid, serialNumber));
+        return new Mcp2221(Mcp2221_OpenBySN(vid, pid, serialNumber));
     }
 
-    public Mcp2221Status Close()
+    public void Close()
     {
-        if (!IsOpen)
+        if (IsOpen)
         {
-            return Mcp2221Status.InvalidHandle;
+            _ = Mcp2221_Close(Handle);
+            Handle = IntPtr.Zero;
         }
-        var st = (Mcp2221Status)NativeMethods.Mcp2221_Close(Handle);
-        Handle = IntPtr.Zero;
-        return st;
     }
 
     public Mcp2221Status Reset()
-        => (Mcp2221Status)NativeMethods.Mcp2221_Reset(Handle);
+        => (Mcp2221Status)Mcp2221_Reset(Handle);
 
     public static Mcp2221Status CloseAll()
-        => (Mcp2221Status)NativeMethods.Mcp2221_CloseAll();
+        => (Mcp2221Status)Mcp2221_CloseAll();
 
     //------------------------------------------------------------------------
     // Library/Enumeration
@@ -62,7 +65,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     // TODO override ?
     public static Mcp2221Status GetConnectedDevices(uint vid, uint pid, out uint count)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetConnectedDevices(vid, pid, out count);
+        => (Mcp2221Status)Mcp2221_GetConnectedDevices(vid, pid, out count);
 
     public static Mcp2221Status GetLibraryVersion(out string version)
     {
@@ -71,15 +74,11 @@ public sealed unsafe class Mcp2221 : IDisposable
 
         fixed (char* p = buf)
         {
-            var st = (Mcp2221Status)NativeMethods.Mcp2221_GetLibraryVersion(p);
-            if (st != Mcp2221Status.NoError)
-            {
-                version = string.Empty;
-                return st;
-            }
-
-            version = CreateStringFromNullTerminated(p, buf.Length);
-            return Mcp2221Status.NoError;
+            var status = (Mcp2221Status)Mcp2221_GetLibraryVersion(p);
+            version = status == Mcp2221Status.NoError
+                ? CreateStringFromNullTerminated(p, buf.Length)
+                : string.Empty;
+            return status;
         }
     }
 
@@ -94,20 +93,16 @@ public sealed unsafe class Mcp2221 : IDisposable
 
         fixed (char* p = buf)
         {
-            var st = (Mcp2221Status)NativeMethods.Mcp2221_GetManufacturerDescriptor(Handle, p);
-            if (st != Mcp2221Status.NoError)
-            {
-                manufacturer = string.Empty;
-                return st;
-            }
-
-            manufacturer = CreateStringFromNullTerminated(p, buf.Length);
-            return Mcp2221Status.NoError;
+            var status = (Mcp2221Status)Mcp2221_GetManufacturerDescriptor(Handle, p);
+            manufacturer = status == Mcp2221Status.NoError
+                ? CreateStringFromNullTerminated(p, buf.Length)
+                : string.Empty;
+            return status;
         }
     }
 
     public Mcp2221Status SetManufacturerDescriptor(string manufacturer)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetManufacturerDescriptor(Handle, manufacturer);
+        => (Mcp2221Status)Mcp2221_SetManufacturerDescriptor(Handle, manufacturer);
 
     public Mcp2221Status GetProductDescriptor(out string product)
     {
@@ -116,20 +111,16 @@ public sealed unsafe class Mcp2221 : IDisposable
 
         fixed (char* p = buf)
         {
-            var st = (Mcp2221Status)NativeMethods.Mcp2221_GetProductDescriptor(Handle, p);
-            if (st != Mcp2221Status.NoError)
-            {
-                product = string.Empty;
-                return st;
-            }
-
-            product = CreateStringFromNullTerminated(p, buf.Length);
-            return Mcp2221Status.NoError;
+            var status = (Mcp2221Status)Mcp2221_GetProductDescriptor(Handle, p);
+            product = status == Mcp2221Status.NoError
+                ? CreateStringFromNullTerminated(p, buf.Length)
+                : string.Empty;
+            return status;
         }
     }
 
     public Mcp2221Status SetProductDescriptor(string product)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetProductDescriptor(Handle, product);
+        => (Mcp2221Status)Mcp2221_SetProductDescriptor(Handle, product);
 
     public Mcp2221Status GetSerialNumberDescriptor(out string serial)
     {
@@ -138,20 +129,16 @@ public sealed unsafe class Mcp2221 : IDisposable
 
         fixed (char* p = buf)
         {
-            var st = (Mcp2221Status)NativeMethods.Mcp2221_GetSerialNumberDescriptor(Handle, p);
-            if (st != Mcp2221Status.NoError)
-            {
-                serial = string.Empty;
-                return st;
-            }
-
-            serial = CreateStringFromNullTerminated(p, buf.Length);
-            return Mcp2221Status.NoError;
+            var status = (Mcp2221Status)Mcp2221_GetSerialNumberDescriptor(Handle, p);
+            serial = status == Mcp2221Status.NoError
+                ? CreateStringFromNullTerminated(p, buf.Length)
+                : string.Empty;
+            return status;
         }
     }
 
     public Mcp2221Status SetSerialNumberDescriptor(string serial)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetSerialNumberDescriptor(Handle, serial);
+        => (Mcp2221Status)Mcp2221_SetSerialNumberDescriptor(Handle, serial);
 
     public Mcp2221Status GetFactorySerialNumber(out string serial)
     {
@@ -160,15 +147,11 @@ public sealed unsafe class Mcp2221 : IDisposable
 
         fixed (char* p = buf)
         {
-            var st = (Mcp2221Status)NativeMethods.Mcp2221_GetFactorySerialNumber(Handle, p);
-            if (st != Mcp2221Status.NoError)
-            {
-                serial = string.Empty;
-                return st;
-            }
-
-            serial = CreateStringFromNullTerminated(p, buf.Length);
-            return Mcp2221Status.NoError;
+            var status = (Mcp2221Status)Mcp2221_GetFactorySerialNumber(Handle, p);
+            serial = status == Mcp2221Status.NoError
+                ? CreateStringFromNullTerminated(p, buf.Length)
+                : string.Empty;
+            return status;
         }
     }
 
@@ -182,17 +165,18 @@ public sealed unsafe class Mcp2221 : IDisposable
         fixed (char* pHw = hw)
         fixed (char* pFw = fw)
         {
-            var st = (Mcp2221Status)NativeMethods.Mcp2221_GetHwFwRevisions(Handle, pHw, pFw);
-            if (st != Mcp2221Status.NoError)
+            var status = (Mcp2221Status)Mcp2221_GetHwFwRevisions(Handle, pHw, pFw);
+            if (status == Mcp2221Status.NoError)
+            {
+                hardwareRevision = CreateStringFromNullTerminated(pHw, hw.Length);
+                firmwareRevision = CreateStringFromNullTerminated(pFw, fw.Length);
+            }
+            else
             {
                 hardwareRevision = string.Empty;
                 firmwareRevision = string.Empty;
-                return st;
             }
-
-            hardwareRevision = CreateStringFromNullTerminated(pHw, hw.Length);
-            firmwareRevision = CreateStringFromNullTerminated(pFw, fw.Length);
-            return Mcp2221Status.NoError;
+            return status;
         }
     }
 
@@ -201,41 +185,41 @@ public sealed unsafe class Mcp2221 : IDisposable
     //------------------------------------------------------------------------
 
     public Mcp2221Status GetVidPid(out uint vid, out uint pid)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetVidPid(Handle, out vid, out pid);
+        => (Mcp2221Status)Mcp2221_GetVidPid(Handle, out vid, out pid);
 
     public Mcp2221Status SetVidPid(uint vid, uint pid)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetVidPid(Handle, vid, pid);
+        => (Mcp2221Status)Mcp2221_SetVidPid(Handle, vid, pid);
 
     public Mcp2221Status GetUsbPowerAttributes(out byte powerAttributes, out uint currentReq)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetUsbPowerAttributes(Handle, out powerAttributes, out currentReq);
+        => (Mcp2221Status)Mcp2221_GetUsbPowerAttributes(Handle, out powerAttributes, out currentReq);
 
     public Mcp2221Status SetUsbPowerAttributes(byte powerAttributes, uint currentReq)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetUsbPowerAttributes(Handle, powerAttributes, currentReq);
+        => (Mcp2221Status)Mcp2221_SetUsbPowerAttributes(Handle, powerAttributes, currentReq);
 
     public Mcp2221Status GetSerialNumberEnumerationEnable(out byte enabled)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetSerialNumberEnumerationEnable(Handle, out enabled);
+        => (Mcp2221Status)Mcp2221_GetSerialNumberEnumerationEnable(Handle, out enabled);
 
     public Mcp2221Status SetSerialNumberEnumerationEnable(byte enabled)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetSerialNumberEnumerationEnable(Handle, enabled);
+        => (Mcp2221Status)Mcp2221_SetSerialNumberEnumerationEnable(Handle, enabled);
 
     //------------------------------------------------------------------------
     // I2C
     //------------------------------------------------------------------------
 
     public Mcp2221Status I2cCancelCurrentTransfer()
-        => (Mcp2221Status)NativeMethods.Mcp2221_I2cCancelCurrentTransfer(Handle);
+        => (Mcp2221Status)Mcp2221_I2cCancelCurrentTransfer(Handle);
 
     public Mcp2221Status SetAdvancedCommParams(byte timeout, byte maxRetries)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetAdvancedCommParams(Handle, timeout, maxRetries);
+        => (Mcp2221Status)Mcp2221_SetAdvancedCommParams(Handle, timeout, maxRetries);
 
     public Mcp2221Status SetSpeed(uint speed)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetSpeed(Handle, speed);
+        => (Mcp2221Status)Mcp2221_SetSpeed(Handle, speed);
 
     public Mcp2221Status I2cRead(byte slaveAddress, bool use7BitAddress, Span<byte> rx)
     {
         fixed (byte* p = rx)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_I2cRead(
+            return (Mcp2221Status)Mcp2221_I2cRead(
                 Handle,
                 (uint)rx.Length,
                 slaveAddress,
@@ -248,7 +232,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = tx)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_I2cWrite(
+            return (Mcp2221Status)Mcp2221_I2cWrite(
                 Handle,
                 (uint)tx.Length,
                 slaveAddress,
@@ -261,7 +245,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = tx)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_I2cWriteNoStop(
+            return (Mcp2221Status)Mcp2221_I2cWriteNoStop(
                 Handle,
                 (uint)tx.Length,
                 slaveAddress,
@@ -274,7 +258,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = rx)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_I2cReadRestart(
+            return (Mcp2221Status)Mcp2221_I2cReadRestart(
                 Handle,
                 (uint)rx.Length,
                 slaveAddress,
@@ -287,7 +271,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = tx)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_I2cWriteRestart(
+            return (Mcp2221Status)Mcp2221_I2cWriteRestart(
                 Handle,
                 (uint)tx.Length,
                 slaveAddress,
@@ -302,7 +286,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status SmbusWriteByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, byte data)
     {
-        return (Mcp2221Status)NativeMethods.Mcp2221_SmbusWriteByte(
+        return (Mcp2221Status)Mcp2221_SmbusWriteByte(
             Handle,
             slaveAddress,
             use7BitAddress ? (byte)1 : (byte)0,
@@ -315,7 +299,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = &readByte)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusReadByte(
+            return (Mcp2221Status)Mcp2221_SmbusReadByte(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -329,7 +313,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = data2Bytes)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusWriteWord(
+            return (Mcp2221Status)Mcp2221_SmbusWriteWord(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -343,7 +327,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = read2Bytes)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusReadWord(
+            return (Mcp2221Status)Mcp2221_SmbusReadWord(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -357,7 +341,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = data)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusBlockWrite(
+            return (Mcp2221Status)Mcp2221_SmbusBlockWrite(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -372,7 +356,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = readData)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusBlockRead(
+            return (Mcp2221Status)Mcp2221_SmbusBlockRead(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -394,7 +378,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         fixed (byte* pW = writeData)
         fixed (byte* pR = readData)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusBlockWriteBlockReadProcessCall(
+            return (Mcp2221Status)Mcp2221_SmbusBlockWriteBlockReadProcessCall(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -409,7 +393,7 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     public Mcp2221Status SmbusSendByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte data)
     {
-        return (Mcp2221Status)NativeMethods.Mcp2221_SmbusSendByte(
+        return (Mcp2221Status)Mcp2221_SmbusSendByte(
             Handle,
             slaveAddress,
             use7BitAddress ? (byte)1 : (byte)0,
@@ -421,7 +405,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = &readByte)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SmbusReceiveByte(
+            return (Mcp2221Status)Mcp2221_SmbusReceiveByte(
                 Handle,
                 slaveAddress,
                 use7BitAddress ? (byte)1 : (byte)0,
@@ -436,61 +420,61 @@ public sealed unsafe class Mcp2221 : IDisposable
 
     // TODO check
     public Mcp2221Status GetInitialPinValues(out byte ledUrxInitVal, out byte ledUtxInitVal, out byte ledI2cInitVal, out byte sspndInitVal, out byte usbCfgInitVal)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetInitialPinValues(Handle, out ledUrxInitVal, out ledUtxInitVal, out ledI2cInitVal, out sspndInitVal, out usbCfgInitVal);
+        => (Mcp2221Status)Mcp2221_GetInitialPinValues(Handle, out ledUrxInitVal, out ledUtxInitVal, out ledI2cInitVal, out sspndInitVal, out usbCfgInitVal);
 
     public Mcp2221Status SetInitialPinValues(byte ledUrxInitVal, byte ledUtxInitVal, byte ledI2cInitVal, byte sspndInitVal, byte usbCfgInitVal)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetInitialPinValues(Handle, ledUrxInitVal, ledUtxInitVal, ledI2cInitVal, sspndInitVal, usbCfgInitVal);
+        => (Mcp2221Status)Mcp2221_SetInitialPinValues(Handle, ledUrxInitVal, ledUtxInitVal, ledI2cInitVal, sspndInitVal, usbCfgInitVal);
 
     // TODO check
     public Mcp2221Status GetInterruptEdgeSetting(byte whichToGet, out byte interruptPinMode)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetInterruptEdgeSetting(Handle, whichToGet, out interruptPinMode);
+        => (Mcp2221Status)Mcp2221_GetInterruptEdgeSetting(Handle, whichToGet, out interruptPinMode);
 
     public Mcp2221Status SetInterruptEdgeSetting(byte whichToSet, byte interruptPinMode)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetInterruptEdgeSetting(Handle, whichToSet, interruptPinMode);
+        => (Mcp2221Status)Mcp2221_SetInterruptEdgeSetting(Handle, whichToSet, interruptPinMode);
 
     public Mcp2221Status ClearInterruptPinFlag()
-        => (Mcp2221Status)NativeMethods.Mcp2221_ClearInterruptPinFlag(Handle);
+        => (Mcp2221Status)Mcp2221_ClearInterruptPinFlag(Handle);
 
     // TODO check
     public Mcp2221Status GetInterruptPinFlag(out byte flagValue)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetInterruptPinFlag(Handle, out flagValue);
+        => (Mcp2221Status)Mcp2221_GetInterruptPinFlag(Handle, out flagValue);
 
     // TODO check
     public Mcp2221Status GetClockSettings(byte whichToGet, out byte dutyCycle, out byte clockDivider)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetClockSettings(Handle, whichToGet, out dutyCycle, out clockDivider);
+        => (Mcp2221Status)Mcp2221_GetClockSettings(Handle, whichToGet, out dutyCycle, out clockDivider);
 
     public Mcp2221Status SetClockSettings(byte whichToSet, byte dutyCycle, byte clockDivider)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetClockSettings(Handle, whichToSet, dutyCycle, clockDivider);
+        => (Mcp2221Status)Mcp2221_SetClockSettings(Handle, whichToSet, dutyCycle, clockDivider);
 
     // TODO check
     public Mcp2221Status GetAdcData(Span<uint> adcDataArray)
     {
         fixed (uint* p = adcDataArray)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_GetAdcData(Handle, p);
+            return (Mcp2221Status)Mcp2221_GetAdcData(Handle, p);
         }
     }
 
     // TODO check
     public Mcp2221Status GetAdcVref(byte whichToGet, out byte adcVref)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetAdcVref(Handle, whichToGet, out adcVref);
+        => (Mcp2221Status)Mcp2221_GetAdcVref(Handle, whichToGet, out adcVref);
 
     public Mcp2221Status SetAdcVref(byte whichToSet, byte adcVref)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetAdcVref(Handle, whichToSet, adcVref);
+        => (Mcp2221Status)Mcp2221_SetAdcVref(Handle, whichToSet, adcVref);
 
     // TODO check
     public Mcp2221Status GetDacVref(byte whichToGet, out byte dacVref)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetDacVref(Handle, whichToGet, out dacVref);
+        => (Mcp2221Status)Mcp2221_GetDacVref(Handle, whichToGet, out dacVref);
 
     public Mcp2221Status SetDacVref(byte whichToSet, byte dacVref)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetDacVref(Handle, whichToSet, dacVref);
+        => (Mcp2221Status)Mcp2221_SetDacVref(Handle, whichToSet, dacVref);
 
     // TODO check
     public Mcp2221Status GetDacValue(byte whichToGet, out byte dacValue)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetDacValue(Handle, whichToGet, out dacValue);
+        => (Mcp2221Status)Mcp2221_GetDacValue(Handle, whichToGet, out dacValue);
 
     public Mcp2221Status SetDacValue(byte whichToSet, byte dacValue)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetDacValue(Handle, whichToSet, dacValue);
+        => (Mcp2221Status)Mcp2221_SetDacValue(Handle, whichToSet, dacValue);
 
     // TODO check
     public Mcp2221Status GetGpioSettings(byte whichToGet, Span<byte> pinFunctions, Span<byte> pinDirections, Span<byte> outputValues)
@@ -499,7 +483,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         fixed (byte* pD = pinDirections)
         fixed (byte* pO = outputValues)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_GetGpioSettings(Handle, whichToGet, pF, pD, pO);
+            return (Mcp2221Status)Mcp2221_GetGpioSettings(Handle, whichToGet, pF, pD, pO);
         }
     }
 
@@ -510,7 +494,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         fixed (byte* pD = pinDirections)
         fixed (byte* pO = outputValues)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SetGpioSettings(Handle, whichToSet, pF, pD, pO);
+            return (Mcp2221Status)Mcp2221_SetGpioSettings(Handle, whichToSet, pF, pD, pO);
         }
     }
 
@@ -519,7 +503,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = gpioValues)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_GetGpioValues(Handle, p);
+            return (Mcp2221Status)Mcp2221_GetGpioValues(Handle, p);
         }
     }
 
@@ -528,7 +512,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = gpioValues)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SetGpioValues(Handle, p);
+            return (Mcp2221Status)Mcp2221_SetGpioValues(Handle, p);
         }
     }
 
@@ -537,7 +521,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = gpioDir)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_GetGpioDirection(Handle, p);
+            return (Mcp2221Status)Mcp2221_GetGpioDirection(Handle, p);
         }
     }
 
@@ -546,7 +530,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     {
         fixed (byte* p = gpioDir)
         {
-            return (Mcp2221Status)NativeMethods.Mcp2221_SetGpioDirection(Handle, p);
+            return (Mcp2221Status)Mcp2221_SetGpioDirection(Handle, p);
         }
     }
 
@@ -555,19 +539,19 @@ public sealed unsafe class Mcp2221 : IDisposable
     //------------------------------------------------------------------------
 
     public Mcp2221Status GetSecuritySetting(out byte securitySetting)
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetSecuritySetting(Handle, out securitySetting);
+        => (Mcp2221Status)Mcp2221_GetSecuritySetting(Handle, out securitySetting);
 
     public Mcp2221Status SetSecuritySetting(byte securitySetting, string currentPassword, string newPassword)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SetSecuritySetting(Handle, securitySetting, currentPassword, newPassword);
+        => (Mcp2221Status)Mcp2221_SetSecuritySetting(Handle, securitySetting, currentPassword, newPassword);
 
     public Mcp2221Status SendPassword(string password)
-        => (Mcp2221Status)NativeMethods.Mcp2221_SendPassword(Handle, password);
+        => (Mcp2221Status)Mcp2221_SendPassword(Handle, password);
 
     //public Mcp2221Status SetPermanentLock()
-    //    => (Mcp2221Status)NativeMethods.Mcp2221_SetPermanentLock(Handle);
+    //    => (Mcp2221Status)Mcp2221_SetPermanentLock(Handle);
 
     public static Mcp2221Status GetLastError()
-        => (Mcp2221Status)NativeMethods.Mcp2221_GetLastError();
+        => (Mcp2221Status)Mcp2221_GetLastError();
 
     //------------------------------------------------------------------------
     // Helpers
