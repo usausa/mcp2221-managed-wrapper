@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.1" />
+    <PackageReference Include="Usa.Smart.CommandLine.Hosting" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MCP2221ManagedWrapper\MCP2221ManagedWrapper.csproj" />
   </ItemGroup>
 
