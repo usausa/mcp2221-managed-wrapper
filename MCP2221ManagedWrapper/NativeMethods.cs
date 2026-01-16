@@ -2,7 +2,6 @@ namespace MCP2221ManagedWrapper;
 
 using System.Runtime.InteropServices;
 
-// TODO check all extern
 // ReSharper disable CommentTypo
 // ReSharper disable GrammarMistakeInComment
 // ReSharper disable IdentifierTypo
@@ -75,8 +74,6 @@ internal static unsafe class NativeMethods
     public const int E_ERR_RAW_TX_TOO_LARGE = -301;
     public const int E_ERR_RAW_TX_COPYFAILED = -302;
     public const int E_ERR_RAW_RX_COPYFAILED = -303;
-
-    // TODO check all const
 
     // Constants
 
