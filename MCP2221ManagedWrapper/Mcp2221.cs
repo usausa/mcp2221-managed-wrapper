@@ -2,17 +2,118 @@ namespace MCP2221ManagedWrapper;
 
 using static MCP2221ManagedWrapper.NativeMethods;
 
-public enum PinMode
+#pragma warning disable CA1008
+#pragma warning disable CA1028
+#pragma warning disable CA1069
+#pragma warning disable CA1707
+public enum PinDirection : byte
 {
     Output = MCP2221_GPDIR_OUTPUT,
     Input = MCP2221_GPDIR_INPUT
 }
 
-public enum PinValue
+public enum PinValue : byte
 {
     Low = MCP2221_GPVAL_LOW,
     High = MCP2221_GPVAL_HIGH
 }
+
+// GP0        GP1       GP2        GP3
+// --------------------------------------
+// Gpio       Gpio      Gpio       Gpio
+// Sspnd      ClockOut  UsbConfig  LedI2c
+// LedUartRx  Adc       Adc        Adc
+// LedUartTx  Dac       Dac
+//            InterruptDetection
+public enum PinFunction : byte
+{
+    // 0
+    Gpio = MCP2221_GPFUNC_IO,
+    // 1
+    Sspnd = MCP2221_GP_SSPND,
+    ClockOut = MCP2221_GP_CLOCK_OUT,
+    UsbConfig = MCP2221_GP_USBCFG,
+    LedI2c = MCP2221_GP_LED_I2C,
+    // 2
+    LedUartRx = MCP2221_GP_LED_UART_RX,
+    Adc = MCP2221_GP_ADC,
+    // 3
+    LedUartTx = MCP2221_GP_LED_UART_TX,
+    Dac = MCP2221_GP_DAC,
+    // 4
+    InterruptDetection = MCP2221_GP_IOC
+}
+
+public enum ValueSource : byte
+{
+    Flash = FLASH_SETTINGS,
+    Runtime = RUNTIME_SETTINGS
+}
+
+public enum InterruptEdge : byte
+{
+    None = INTERRUPT_NONE,
+    Positive = INTERRUPT_POSITIVE_EDGE,
+    Negative = INTERRUPT_NEGATIVE_EDGE,
+    Both = INTERRUPT_BOTH_EDGES
+}
+
+public enum VoltageReference : byte
+{
+    Vdd = VREF_VDD,
+    V1024 = VREF_1024V,
+    V2048 = VREF_2048V,
+    V4096 = VREF_4096V
+}
+
+[Flags]
+public enum PowerAttributes : byte
+{
+    Bus = MCP2221_USB_BUS,
+    Self = MCP2221_USB_SELF,
+    Remote = MCP2221_USB_REMOTE
+}
+
+public enum SecuritySetting : byte
+{
+    Disable = MCP2221_PASS_DISABLE,
+    Enable = MCP2221_PASS_ENABLE,
+    Change = MCP2221_PASS_CHANGE
+}
+
+public enum DutyCycle : byte
+{
+    P0 = 0, // 0 %
+    P25 = 1, // 25 %
+    P50 = 2, // 50 %
+    P75 = 3 // 75 %
+}
+
+public enum ClockDivider : byte
+{
+    MHz24 = 1, // 24 MHz
+    MHz12 = 2, // 12 MHz
+    MHz6 = 3, // 6 MHz
+    MHz3 = 4, // 3 MHz
+    MHz1_5 = 5, // 1.5 MHz
+    KHz750 = 6, // 750 kHz
+    KHz375 = 7, // 375 kHz
+}
+#pragma warning restore CA1707
+#pragma warning restore CA1069
+#pragma warning restore CA1028
+#pragma warning restore CA1008
+
+#pragma warning disable CA1819
+public sealed class GpioSettings
+{
+    public PinFunction[] Functions { get; } = new PinFunction[4];
+
+    public PinDirection[] Directions { get; } = new PinDirection[4];
+
+    public PinValue[] Values { get; } = new PinValue[4];
+}
+#pragma warning restore CA1819
 
 // ReSharper disable InconsistentNaming
 public sealed unsafe class Mcp2221 : IDisposable
@@ -203,11 +304,15 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetVidPid(uint vid, uint pid)
         => (Mcp2221Status)Mcp2221_SetVidPid(Handle, vid, pid);
 
-    public Mcp2221Status GetUsbPowerAttributes(out byte powerAttributes, out uint currentReq)
-        => (Mcp2221Status)Mcp2221_GetUsbPowerAttributes(Handle, out powerAttributes, out currentReq);
+    public Mcp2221Status GetUsbPowerAttributes(out PowerAttributes powerAttributes, out uint currentReq)
+    {
+        var status = (Mcp2221Status)Mcp2221_GetUsbPowerAttributes(Handle, out var powerAttributesByte, out currentReq);
+        powerAttributes = (PowerAttributes)powerAttributesByte;
+        return status;
+    }
 
-    public Mcp2221Status SetUsbPowerAttributes(byte powerAttributes, uint currentReq)
-        => (Mcp2221Status)Mcp2221_SetUsbPowerAttributes(Handle, powerAttributes, currentReq);
+    public Mcp2221Status SetUsbPowerAttributes(PowerAttributes powerAttributes, uint currentReq)
+        => (Mcp2221Status)Mcp2221_SetUsbPowerAttributes(Handle, (byte)powerAttributes, currentReq);
 
     public Mcp2221Status GetSerialNumberEnumerationEnable(out byte enabled)
         => (Mcp2221Status)Mcp2221_GetSerialNumberEnumerationEnable(Handle, out enabled);
@@ -437,86 +542,96 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetInitialPinValues(byte ledUartRx, byte ledUartTx, byte ledI2c, byte sspnd, byte usbCfg)
         => (Mcp2221Status)Mcp2221_SetInitialPinValues(Handle, ledUartRx, ledUartTx, ledI2c, sspnd, usbCfg);
 
-    // TODO Enum
-    public Mcp2221Status GetInterruptEdgeSetting(byte whichToGet, out byte interruptPinMode)
-        => (Mcp2221Status)Mcp2221_GetInterruptEdgeSetting(Handle, whichToGet, out interruptPinMode);
+    public Mcp2221Status GetInterruptEdgeSetting(ValueSource source, out InterruptEdge interruptEdge)
+    {
+        var status = (Mcp2221Status)Mcp2221_GetInterruptEdgeSetting(Handle, (byte)source, out var interruptPinDirection);
+        interruptEdge = (InterruptEdge)interruptPinDirection;
+        return status;
+    }
 
-    public Mcp2221Status SetInterruptEdgeSetting(byte whichToSet, byte interruptPinMode)
-        => (Mcp2221Status)Mcp2221_SetInterruptEdgeSetting(Handle, whichToSet, interruptPinMode);
+    public Mcp2221Status SetInterruptEdgeSetting(ValueSource source, InterruptEdge interruptEdge)
+        => (Mcp2221Status)Mcp2221_SetInterruptEdgeSetting(Handle, (byte)source, (byte)interruptEdge);
 
-    // TODO check
     public Mcp2221Status ClearInterruptPinFlag()
         => (Mcp2221Status)Mcp2221_ClearInterruptPinFlag(Handle);
 
     public Mcp2221Status GetInterruptPinFlag(out byte flagValue)
         => (Mcp2221Status)Mcp2221_GetInterruptPinFlag(Handle, out flagValue);
 
-    // TODO Enum
-    public Mcp2221Status GetClockSettings(byte whichToGet, out byte dutyCycle, out byte clockDivider)
-        => (Mcp2221Status)Mcp2221_GetClockSettings(Handle, whichToGet, out dutyCycle, out clockDivider);
-
-    public Mcp2221Status SetClockSettings(byte whichToSet, byte dutyCycle, byte clockDivider)
-        => (Mcp2221Status)Mcp2221_SetClockSettings(Handle, whichToSet, dutyCycle, clockDivider);
-
-    // TODO check
-    public Mcp2221Status GetAdcData(Span<uint> adcDataArray)
+    public Mcp2221Status GetClockSettings(ValueSource source, out DutyCycle dutyCycle, out ClockDivider clockDivider)
     {
-        fixed (uint* p = adcDataArray)
-        {
-            return (Mcp2221Status)Mcp2221_GetAdcData(Handle, p);
-        }
+        var status = (Mcp2221Status)Mcp2221_GetClockSettings(Handle, (byte)source, out var dutyCycleByte, out var clockDividerByte);
+        dutyCycle = (DutyCycle)dutyCycleByte;
+        clockDivider = (ClockDivider)clockDividerByte;
+        return status;
     }
 
-    // TODO check
-    public Mcp2221Status GetAdcVref(byte whichToGet, out byte adcVref)
-        => (Mcp2221Status)Mcp2221_GetAdcVref(Handle, whichToGet, out adcVref);
+    public Mcp2221Status SetClockSettings(ValueSource source, DutyCycle dutyCycle, ClockDivider clockDivider)
+        => (Mcp2221Status)Mcp2221_SetClockSettings(Handle, (byte)source, (byte)dutyCycle, (byte)clockDivider);
 
-    public Mcp2221Status SetAdcVref(byte whichToSet, byte adcVref)
-        => (Mcp2221Status)Mcp2221_SetAdcVref(Handle, whichToSet, adcVref);
-
-    // TODO check
-    public Mcp2221Status GetDacVref(byte whichToGet, out byte dacVref)
-        => (Mcp2221Status)Mcp2221_GetDacVref(Handle, whichToGet, out dacVref);
-
-    public Mcp2221Status SetDacVref(byte whichToSet, byte dacVref)
-        => (Mcp2221Status)Mcp2221_SetDacVref(Handle, whichToSet, dacVref);
-
-    // TODO check
-    public Mcp2221Status GetDacValue(byte whichToGet, out byte dacValue)
-        => (Mcp2221Status)Mcp2221_GetDacValue(Handle, whichToGet, out dacValue);
-
-    public Mcp2221Status SetDacValue(byte whichToSet, byte dacValue)
-        => (Mcp2221Status)Mcp2221_SetDacValue(Handle, whichToSet, dacValue);
-
-    // TODO check
-    public Mcp2221Status GetGpioSettings(byte whichToGet, Span<byte> pinFunctions, Span<byte> pinDirections, Span<byte> outputValues)
+    public Mcp2221Status GetAdcData(out uint value1, out uint value2, out uint value3)
     {
-        fixed (byte* pF = pinFunctions)
-        fixed (byte* pD = pinDirections)
-        fixed (byte* pO = outputValues)
-        {
-            return (Mcp2221Status)Mcp2221_GetGpioSettings(Handle, whichToGet, pF, pD, pO);
-        }
+        var buffer = stackalloc uint[3];
+        var status = (Mcp2221Status)Mcp2221_GetAdcData(Handle, buffer);
+        value1 = buffer[0];
+        value2 = buffer[1];
+        value3 = buffer[2];
+        return status;
     }
 
-    // TODO check
-    public Mcp2221Status SetGpioSettings(byte whichToSet, ReadOnlySpan<byte> pinFunctions, ReadOnlySpan<byte> pinDirections, ReadOnlySpan<byte> outputValues)
+    public Mcp2221Status GetAdcVref(ValueSource source, out VoltageReference adcVref)
     {
-        fixed (byte* pF = pinFunctions)
-        fixed (byte* pD = pinDirections)
-        fixed (byte* pO = outputValues)
-        {
-            return (Mcp2221Status)Mcp2221_SetGpioSettings(Handle, whichToSet, pF, pD, pO);
-        }
+        var status = (Mcp2221Status)Mcp2221_GetAdcVref(Handle, (byte)source, out var adcVrefByte);
+        adcVref = (VoltageReference)adcVrefByte;
+        return status;
     }
 
-    // TODO Delete
-    public Mcp2221Status GetGpioValues(Span<byte> gpioValues)
+    public Mcp2221Status SetAdcVref(ValueSource source, VoltageReference adcVref)
+        => (Mcp2221Status)Mcp2221_SetAdcVref(Handle, (byte)source, (byte)adcVref);
+
+    public Mcp2221Status GetDacVref(ValueSource source, out VoltageReference dacVref)
     {
-        fixed (byte* p = gpioValues)
+        var status = (Mcp2221Status)Mcp2221_GetDacVref(Handle, (byte)source, out var dacVrefByte);
+        dacVref = (VoltageReference)dacVrefByte;
+        return status;
+    }
+
+    public Mcp2221Status SetDacVref(ValueSource source, VoltageReference dacVref)
+        => (Mcp2221Status)Mcp2221_SetDacVref(Handle, (byte)source, (byte)dacVref);
+
+    public Mcp2221Status GetDacValue(ValueSource source, out byte dacValue)
+        => (Mcp2221Status)Mcp2221_GetDacValue(Handle, (byte)source, out dacValue);
+
+    public Mcp2221Status SetDacValue(ValueSource source, byte dacValue)
+        => (Mcp2221Status)Mcp2221_SetDacValue(Handle, (byte)source, dacValue);
+
+    public Mcp2221Status GetGpioSettings(ValueSource source, GpioSettings settings)
+    {
+        var functions = stackalloc byte[4];
+        var directions = stackalloc byte[4];
+        var modes = stackalloc byte[4];
+        var status = (Mcp2221Status)Mcp2221_GetGpioSettings(Handle, (byte)source, functions, directions, modes);
+        for (var i = 0; i < 4; i++)
         {
-            return (Mcp2221Status)Mcp2221_GetGpioValues(Handle, p);
+            settings.Functions[i] = (PinFunction)functions[i];
+            settings.Directions[i] = (PinDirection)directions[i];
+            settings.Values[i] = (PinValue)modes[i];
         }
+        return status;
+    }
+
+    public Mcp2221Status SetGpioSettings(ValueSource source, GpioSettings settings)
+    {
+        var functions = stackalloc byte[4];
+        var directions = stackalloc byte[4];
+        var modes = stackalloc byte[4];
+        for (var i = 0; i < 4; i++)
+        {
+            functions[i] = (byte)settings.Functions[i];
+            directions[i] = (byte)settings.Directions[i];
+            modes[i] = (byte)settings.Values[i];
+        }
+        return (Mcp2221Status)Mcp2221_SetGpioSettings(Handle, (byte)source, functions, directions, modes);
     }
 
     public Mcp2221Status GetGpioValues(out PinValue value0, out PinValue value1, out PinValue value2, out PinValue value3)
@@ -528,15 +643,6 @@ public sealed unsafe class Mcp2221 : IDisposable
         value2 = (PinValue)buffer[2];
         value3 = (PinValue)buffer[3];
         return status;
-    }
-
-    // TODO Delete
-    public Mcp2221Status SetGpioValues(ReadOnlySpan<byte> gpioValues)
-    {
-        fixed (byte* p = gpioValues)
-        {
-            return (Mcp2221Status)Mcp2221_SetGpioValues(Handle, p);
-        }
     }
 
     public Mcp2221Status SetGpioValues(PinValue value0, PinValue value1, PinValue value2, PinValue value3)
@@ -578,36 +684,18 @@ public sealed unsafe class Mcp2221 : IDisposable
         return SetGpioValues(value0, value1, value2, value3);
     }
 
-    // TODO Delete
-    public Mcp2221Status GetGpioDirection(Span<byte> gpioDir)
-    {
-        fixed (byte* p = gpioDir)
-        {
-            return (Mcp2221Status)Mcp2221_GetGpioDirection(Handle, p);
-        }
-    }
-
-    public Mcp2221Status GetGpioDirection(out PinMode mode0, out PinMode mode1, out PinMode mode2, out PinMode mode3)
+    public Mcp2221Status GetGpioDirection(out PinDirection mode0, out PinDirection mode1, out PinDirection mode2, out PinDirection mode3)
     {
         var buffer = stackalloc byte[4];
         var status = (Mcp2221Status)Mcp2221_SetGpioDirection(Handle, buffer);
-        mode0 = (PinMode)buffer[0];
-        mode1 = (PinMode)buffer[1];
-        mode2 = (PinMode)buffer[2];
-        mode3 = (PinMode)buffer[3];
+        mode0 = (PinDirection)buffer[0];
+        mode1 = (PinDirection)buffer[1];
+        mode2 = (PinDirection)buffer[2];
+        mode3 = (PinDirection)buffer[3];
         return status;
     }
 
-    // TODO Delete
-    public Mcp2221Status SetGpioDirection(ReadOnlySpan<byte> gpioDir)
-    {
-        fixed (byte* p = gpioDir)
-        {
-            return (Mcp2221Status)Mcp2221_SetGpioDirection(Handle, p);
-        }
-    }
-
-    public Mcp2221Status SetGpioDirection(PinMode mode0, PinMode mode1, PinMode mode2, PinMode mode3)
+    public Mcp2221Status SetGpioDirection(PinDirection mode0, PinDirection mode1, PinDirection mode2, PinDirection mode3)
     {
         var buffer = stackalloc byte[4];
         buffer[0] = (byte)mode0;
@@ -617,7 +705,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return (Mcp2221Status)Mcp2221_SetGpioDirection(Handle, buffer);
     }
 
-    public Mcp2221Status SetGpioDirection(int pin, PinMode mode)
+    public Mcp2221Status SetGpioDirection(int pin, PinDirection mode)
     {
         var status = GetGpioDirection(out var mode0, out var mode1, out var mode2, out var mode3);
         if (status != Mcp2221Status.NoError)
@@ -650,11 +738,15 @@ public sealed unsafe class Mcp2221 : IDisposable
     // Misc
     //------------------------------------------------------------------------
 
-    public Mcp2221Status GetSecuritySetting(out byte securitySetting)
-        => (Mcp2221Status)Mcp2221_GetSecuritySetting(Handle, out securitySetting);
+    public Mcp2221Status GetSecuritySetting(out SecuritySetting securitySetting)
+    {
+        var status = (Mcp2221Status)Mcp2221_GetSecuritySetting(Handle, out var securitySettingByte);
+        securitySetting = (SecuritySetting)securitySettingByte;
+        return status;
+    }
 
-    public Mcp2221Status SetSecuritySetting(byte securitySetting, string currentPassword, string newPassword)
-        => (Mcp2221Status)Mcp2221_SetSecuritySetting(Handle, securitySetting, currentPassword, newPassword);
+    public Mcp2221Status SetSecuritySetting(SecuritySetting securitySetting, string currentPassword, string newPassword)
+        => (Mcp2221Status)Mcp2221_SetSecuritySetting(Handle, (byte)securitySetting, currentPassword, newPassword);
 
     public Mcp2221Status SendPassword(string password)
         => (Mcp2221Status)Mcp2221_SendPassword(Handle, password);
