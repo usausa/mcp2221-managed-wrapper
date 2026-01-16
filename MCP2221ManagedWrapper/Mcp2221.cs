@@ -2,6 +2,7 @@ namespace MCP2221ManagedWrapper;
 
 using static MCP2221ManagedWrapper.NativeMethods;
 
+// ReSharper disable InconsistentNaming
 #pragma warning disable CA1008
 #pragma warning disable CA1028
 #pragma warning disable CA1069
@@ -97,12 +98,13 @@ public enum ClockDivider : byte
     MHz3 = 4, // 3 MHz
     MHz1_5 = 5, // 1.5 MHz
     KHz750 = 6, // 750 kHz
-    KHz375 = 7, // 375 kHz
+    KHz375 = 7 // 375 kHz
 }
 #pragma warning restore CA1707
 #pragma warning restore CA1069
 #pragma warning restore CA1028
 #pragma warning restore CA1008
+// ReSharper restore InconsistentNaming
 
 #pragma warning disable CA1819
 public sealed class GpioSettings
