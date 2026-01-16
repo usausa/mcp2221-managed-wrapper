@@ -58,6 +58,8 @@ public sealed class I2cCommand : ICommandHandler
 {
     private const byte Address = 0x44;
 
+    private static readonly byte[] Command = [0x2C, 0x06];
+
     [Option<uint>("--index", "-i", Description = "Index")]
     public uint Index { get; set; }
 
@@ -101,7 +103,7 @@ public sealed class I2cCommand : ICommandHandler
         temperature = default;
         humidity = default;
 
-        var status = device.I2cWrite(Address, true, [0x2C, 0x06]);
+        var status = device.I2cWrite(Address, true, Command);
         if (status != Mcp2221Status.NoError)
         {
             return status;
@@ -110,8 +112,8 @@ public sealed class I2cCommand : ICommandHandler
         Thread.Sleep(20); // Wait for measurement
 
         // Read: T(2) + CRC + RH(2) + CRC
-        Span<byte> data = stackalloc byte[6];
-        status = device.I2cRead(Address, true, data);
+        Span<byte> response = stackalloc byte[6];
+        status = device.I2cRead(Address, true, response);
         if (status != Mcp2221Status.NoError)
         {
             return status;
@@ -119,10 +121,10 @@ public sealed class I2cCommand : ICommandHandler
 
         // Skip CRC check
 
-        var rawTemperature = (ushort)((data[0] << 8) | data[1]);
+        var rawTemperature = (ushort)((response[0] << 8) | response[1]);
         temperature = (float)(-45.0 + (175.0 * rawTemperature / 65535.0));
 
-        var rawHumidity = (ushort)((data[3] << 8) | data[4]);
+        var rawHumidity = (ushort)((response[3] << 8) | response[4]);
         humidity = (float)(100.0 * rawHumidity / 65535.0);
 
         return Mcp2221Status.NoError;
