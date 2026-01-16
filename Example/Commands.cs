@@ -89,15 +89,9 @@ public sealed class I2cCommand : ICommandHandler
         for (var i = 0; i < Loop; i++)
         {
             status = ReadValues(device, out var temperature, out var humidity);
-            if (status == Mcp2221Status.NoError)
-            {
-                Console.WriteLine($"Temperature={temperature}C, humidity={humidity}%");
-            }
-            else
-            {
-                Console.WriteLine($"SetAdvancedCommParams failed. status=[{status}]");
-            }
-
+            Console.WriteLine(status == Mcp2221Status.NoError
+                ? $"Temperature={temperature}C, humidity={humidity}%"
+                : $"SetAdvancedCommParams failed. status=[{status}]");
             await Task.Delay(Wait);
         }
     }
