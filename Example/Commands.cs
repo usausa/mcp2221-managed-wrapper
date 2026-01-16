@@ -92,7 +92,7 @@ public sealed class I2cCommand : ICommandHandler
         {
             status = ReadValues(device, out var temperature, out var humidity);
             Console.WriteLine(status == Mcp2221Status.NoError
-                ? $"Temperature={temperature}C, humidity={humidity}%"
+                ? $"Temperature={temperature:F2}C, humidity={humidity:F2}%"
                 : $"ReadValues failed. status=[{status}]");
             await Task.Delay(Wait);
         }
