@@ -4,7 +4,7 @@
 
 ## What is this?
 
-MCP2221 unmaged wrapper for .NET applications.
+MCP2221 unmaged wrapper for .NET applications.  
 This library provides a managed interface to interact with the MCP2221 USB-to-UART/I2C converter chip from Microchip Technology.
 
 ## Usage example
