@@ -1,16 +1,17 @@
 namespace MCP2221ManagedWrapper;
 
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 // ReSharper disable CommentTypo
 // ReSharper disable GrammarMistakeInComment
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 #pragma warning disable IDE1006
-#pragma warning disable CA2101
 #pragma warning disable CA5392
 #pragma warning disable CS8981
-internal static unsafe class NativeMethods
+internal static unsafe partial class NativeMethods
 {
     private const string DllName = "mcp2221_dll_um_x64.dll";
 
@@ -79,7 +80,7 @@ internal static unsafe class NativeMethods
 
     public const int FLASH_SETTINGS = 0;
     public const int RUNTIME_SETTINGS = 1;
-    public const byte NO_CHANGE = 0xFF;
+    //public const byte NO_CHANGE = 0xFF;
 
     // GPIO settings
 
@@ -122,209 +123,273 @@ internal static unsafe class NativeMethods
     //------------------------------------------------------------------------
 
     // Open/Close
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern IntPtr Mcp2221_OpenByIndex(uint VID, uint PID, uint index);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial IntPtr Mcp2221_OpenByIndex(uint VID, uint PID, uint index);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern IntPtr Mcp2221_OpenBySN(uint VID, uint PID, string serialNo);
+    [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial IntPtr Mcp2221_OpenBySN(uint VID, uint PID, string serialNo);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_Close(IntPtr handle);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_Close(IntPtr handle);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_Reset(IntPtr handle);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_Reset(IntPtr handle);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_CloseAll();
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_CloseAll();
 
     // Library/Enumeration
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_GetLibraryVersion(char* version);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetLibraryVersion(char* version);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetConnectedDevices(uint vid, uint pid, out uint noOfDevs);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetConnectedDevices(uint vid, uint pid, out uint noOfDevs);
 
     // USB descriptors
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_GetManufacturerDescriptor(IntPtr handle, char* manufacturerString);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetManufacturerDescriptor(IntPtr handle, char* manufacturerString);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_SetManufacturerDescriptor(IntPtr handle, string manufacturerString);
+    [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetManufacturerDescriptor(IntPtr handle, string manufacturerString);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_GetProductDescriptor(IntPtr handle, char* productString);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetProductDescriptor(IntPtr handle, char* productString);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_SetProductDescriptor(IntPtr handle, string productString);
+    [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetProductDescriptor(IntPtr handle, string productString);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_GetSerialNumberDescriptor(IntPtr handle, char* serialNumber);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetSerialNumberDescriptor(IntPtr handle, char* serialNumber);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_SetSerialNumberDescriptor(IntPtr handle, string serialNumber);
+    [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetSerialNumberDescriptor(IntPtr handle, string serialNumber);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_GetFactorySerialNumber(IntPtr handle, char* serialNumber);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetFactorySerialNumber(IntPtr handle, char* serialNumber);
 
     // USB
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetVidPid(IntPtr handle, out uint vid, out uint pid);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetVidPid(IntPtr handle, out uint vid, out uint pid);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetVidPid(IntPtr handle, uint vid, uint pid);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetVidPid(IntPtr handle, uint vid, uint pid);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetUsbPowerAttributes(IntPtr handle, out byte powerAttributes, out uint currentReq);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetUsbPowerAttributes(IntPtr handle, out byte powerAttributes, out uint currentReq);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetUsbPowerAttributes(IntPtr handle, byte powerAttributes, uint currentReq);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetUsbPowerAttributes(IntPtr handle, byte powerAttributes, uint currentReq);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetSerialNumberEnumerationEnable(IntPtr handle, out byte snEnumEnabled);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetSerialNumberEnumerationEnable(IntPtr handle, out byte snEnumEnabled);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetSerialNumberEnumerationEnable(IntPtr handle, byte snEnumEnabled);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetSerialNumberEnumerationEnable(IntPtr handle, byte snEnumEnabled);
 
     // I2C
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_I2cCancelCurrentTransfer(IntPtr handle);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_I2cCancelCurrentTransfer(IntPtr handle);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_I2cRead(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_I2cRead(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_I2cWrite(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_I2cWrite(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetAdvancedCommParams(IntPtr handle, byte timeout, byte maxRetries);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetAdvancedCommParams(IntPtr handle, byte timeout, byte maxRetries);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetSpeed(IntPtr handle, uint speed);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetSpeed(IntPtr handle, uint speed);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_I2cWriteNoStop(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_I2cWriteNoStop(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_I2cReadRestart(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_I2cReadRestart(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_I2cWriteRestart(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_I2cWriteRestart(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
 
     // SMBus
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusWriteByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte data);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusWriteByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte data);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusReadByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readByte);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusReadByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readByte);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusWriteWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* data);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusWriteWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* data);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusReadWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusReadWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readData);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusBlockWrite(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* data);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusBlockWrite(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* data);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusBlockRead(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* readData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusBlockRead(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* readData);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusBlockWriteBlockReadProcessCall(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte writeByteCount, byte* writeData, byte readByteCount, byte* readData);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusBlockWriteBlockReadProcessCall(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte writeByteCount, byte* writeData, byte readByteCount, byte* readData);
 
     // GPIO
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetInitialPinValues(IntPtr handle, out byte ledUrxInitVal, out byte ledUtxInitVal, out byte ledI2cInitVal, out byte sspndInitVal, out byte usbCfgInitVal);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetInitialPinValues(IntPtr handle, out byte ledUrxInitVal, out byte ledUtxInitVal, out byte ledI2cInitVal, out byte sspndInitVal, out byte usbCfgInitVal);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetInitialPinValues(IntPtr handle, byte ledUrxInitVal, byte ledUtxInitVal, byte ledI2cInitVal, byte sspndInitVal, byte usbCfgInitVal);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetInitialPinValues(IntPtr handle, byte ledUrxInitVal, byte ledUtxInitVal, byte ledI2cInitVal, byte sspndInitVal, byte usbCfgInitVal);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetInterruptEdgeSetting(IntPtr handle, byte whichToGet, out byte interruptPinMode);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetInterruptEdgeSetting(IntPtr handle, byte whichToGet, out byte interruptPinMode);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetInterruptEdgeSetting(IntPtr handle, byte whichToSet, byte interruptPinMode);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetInterruptEdgeSetting(IntPtr handle, byte whichToSet, byte interruptPinMode);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_ClearInterruptPinFlag(IntPtr handle);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_ClearInterruptPinFlag(IntPtr handle);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetInterruptPinFlag(IntPtr handle, out byte flagValue);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetInterruptPinFlag(IntPtr handle, out byte flagValue);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetClockSettings(IntPtr handle, byte whichToGet, out byte dutyCycle, out byte clockDivider);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetClockSettings(IntPtr handle, byte whichToGet, out byte dutyCycle, out byte clockDivider);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetClockSettings(IntPtr handle, byte whichToSet, byte dutyCycle, byte clockDivider);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetClockSettings(IntPtr handle, byte whichToSet, byte dutyCycle, byte clockDivider);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetAdcData(IntPtr handle, uint* adcDataArray);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetAdcData(IntPtr handle, uint* adcDataArray);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetAdcVref(IntPtr handle, byte whichToGet, out byte adcVref);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetAdcVref(IntPtr handle, byte whichToGet, out byte adcVref);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetAdcVref(IntPtr handle, byte whichToSet, byte adcVref);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetAdcVref(IntPtr handle, byte whichToSet, byte adcVref);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetDacVref(IntPtr handle, byte whichToGet, out byte dacVref);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetDacVref(IntPtr handle, byte whichToGet, out byte dacVref);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetDacVref(IntPtr handle, byte whichToSet, byte dacVref);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetDacVref(IntPtr handle, byte whichToSet, byte dacVref);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetDacValue(IntPtr handle, byte whichToGet, out byte dacValue);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetDacValue(IntPtr handle, byte whichToGet, out byte dacValue);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetDacValue(IntPtr handle, byte whichToSet, byte dacValue);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetDacValue(IntPtr handle, byte whichToSet, byte dacValue);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetGpioSettings(IntPtr handle, byte whichToGet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetGpioSettings(IntPtr handle, byte whichToGet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetGpioSettings(IntPtr handle, byte whichToSet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetGpioSettings(IntPtr handle, byte whichToSet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetGpioValues(IntPtr handle, byte* gpioValues);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetGpioValues(IntPtr handle, byte* gpioValues);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetGpioValues(IntPtr handle, byte* gpioValues);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetGpioValues(IntPtr handle, byte* gpioValues);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetGpioDirection(IntPtr handle, byte* gpioDir);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetGpioDirection(IntPtr handle, byte* gpioDir);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetGpioDirection(IntPtr handle, byte* gpioDir);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetGpioDirection(IntPtr handle, byte* gpioDir);
 
     // Misc
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetSecuritySetting(IntPtr handle, out byte securitySetting);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetSecuritySetting(IntPtr handle, out byte securitySetting);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetSecuritySetting(IntPtr handle, byte securitySetting, [MarshalAs(UnmanagedType.LPStr)] string currentPassword, [MarshalAs(UnmanagedType.LPStr)] string newPassword);
+    [LibraryImport(DllName, StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetSecuritySetting(IntPtr handle, byte securitySetting, string currentPassword, string newPassword);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SendPassword(IntPtr handle, [MarshalAs(UnmanagedType.LPStr)] string password);
+    [LibraryImport(DllName, StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SendPassword(IntPtr handle, string password);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SetPermanentLock(IntPtr handle);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SetPermanentLock(IntPtr handle);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-    public static extern int Mcp2221_GetHwFwRevisions(IntPtr handle, char* hardwareRevision, char* firmwareRevision);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetHwFwRevisions(IntPtr handle, char* hardwareRevision, char* firmwareRevision);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_GetLastError();
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_GetLastError();
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusSendByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte data);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusSendByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte data);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern int Mcp2221_SmbusReceiveByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte* readByte);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    public static partial int Mcp2221_SmbusReceiveByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte* readByte);
 }
