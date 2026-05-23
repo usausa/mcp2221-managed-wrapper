@@ -1,6 +1,7 @@
 namespace MCP2221ManagedWrapper;
 
 using System.Runtime.Versioning;
+
 using static MCP2221ManagedWrapper.NativeMethods;
 
 // ReSharper disable InconsistentNaming
