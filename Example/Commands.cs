@@ -1,3 +1,4 @@
+#pragma warning disable CA1416
 namespace Example;
 
 using MCP2221ManagedWrapper;

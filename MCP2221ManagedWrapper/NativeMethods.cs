@@ -11,7 +11,7 @@ using System.Runtime.InteropServices.Marshalling;
 #pragma warning disable IDE1006
 #pragma warning disable CA5392
 #pragma warning disable CS8981
-internal static unsafe partial class NativeMethods
+internal static partial class NativeMethods
 {
     private const string DllName = "mcp2221_dll_um_x64.dll";
 
@@ -147,7 +147,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetLibraryVersion(char* version);
+    public static unsafe partial int Mcp2221_GetLibraryVersion(char* version);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -157,7 +157,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetManufacturerDescriptor(IntPtr handle, char* manufacturerString);
+    public static unsafe partial int Mcp2221_GetManufacturerDescriptor(IntPtr handle, char* manufacturerString);
 
     [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -165,7 +165,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetProductDescriptor(IntPtr handle, char* productString);
+    public static unsafe partial int Mcp2221_GetProductDescriptor(IntPtr handle, char* productString);
 
     [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -173,7 +173,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetSerialNumberDescriptor(IntPtr handle, char* serialNumber);
+    public static unsafe partial int Mcp2221_GetSerialNumberDescriptor(IntPtr handle, char* serialNumber);
 
     [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf16)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -181,7 +181,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetFactorySerialNumber(IntPtr handle, char* serialNumber);
+    public static unsafe partial int Mcp2221_GetFactorySerialNumber(IntPtr handle, char* serialNumber);
 
     // USB
 
@@ -217,11 +217,11 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_I2cRead(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
+    public static unsafe partial int Mcp2221_I2cRead(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_I2cWrite(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
+    public static unsafe partial int Mcp2221_I2cWrite(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -233,15 +233,15 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_I2cWriteNoStop(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
+    public static unsafe partial int Mcp2221_I2cWriteNoStop(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_I2cReadRestart(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
+    public static unsafe partial int Mcp2221_I2cReadRestart(IntPtr handle, uint bytesToRead, byte slaveAddress, byte use7bitAddress, byte* i2cRxData);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_I2cWriteRestart(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
+    public static unsafe partial int Mcp2221_I2cWriteRestart(IntPtr handle, uint bytesToWrite, byte slaveAddress, byte use7bitAddress, byte* i2cTxData);
 
     // SMBus
 
@@ -251,27 +251,27 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusReadByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readByte);
+    public static unsafe partial int Mcp2221_SmbusReadByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readByte);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusWriteWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* data);
+    public static unsafe partial int Mcp2221_SmbusWriteWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* data);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusReadWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readData);
+    public static unsafe partial int Mcp2221_SmbusReadWord(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte* readData);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusBlockWrite(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* data);
+    public static unsafe partial int Mcp2221_SmbusBlockWrite(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* data);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusBlockRead(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* readData);
+    public static unsafe partial int Mcp2221_SmbusBlockRead(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte byteCount, byte* readData);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusBlockWriteBlockReadProcessCall(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte writeByteCount, byte* writeData, byte readByteCount, byte* readData);
+    public static unsafe partial int Mcp2221_SmbusBlockWriteBlockReadProcessCall(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte command, byte writeByteCount, byte* writeData, byte readByteCount, byte* readData);
 
     // GPIO
 
@@ -309,7 +309,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetAdcData(IntPtr handle, uint* adcDataArray);
+    public static unsafe partial int Mcp2221_GetAdcData(IntPtr handle, uint* adcDataArray);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -337,27 +337,27 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetGpioSettings(IntPtr handle, byte whichToGet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
+    public static unsafe partial int Mcp2221_GetGpioSettings(IntPtr handle, byte whichToGet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SetGpioSettings(IntPtr handle, byte whichToSet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
+    public static unsafe partial int Mcp2221_SetGpioSettings(IntPtr handle, byte whichToSet, byte* pinFunctions, byte* pinDirections, byte* outputValues);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetGpioValues(IntPtr handle, byte* gpioValues);
+    public static unsafe partial int Mcp2221_GetGpioValues(IntPtr handle, byte* gpioValues);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SetGpioValues(IntPtr handle, byte* gpioValues);
+    public static unsafe partial int Mcp2221_SetGpioValues(IntPtr handle, byte* gpioValues);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetGpioDirection(IntPtr handle, byte* gpioDir);
+    public static unsafe partial int Mcp2221_GetGpioDirection(IntPtr handle, byte* gpioDir);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SetGpioDirection(IntPtr handle, byte* gpioDir);
+    public static unsafe partial int Mcp2221_SetGpioDirection(IntPtr handle, byte* gpioDir);
 
     // Misc
 
@@ -379,7 +379,7 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_GetHwFwRevisions(IntPtr handle, char* hardwareRevision, char* firmwareRevision);
+    public static unsafe partial int Mcp2221_GetHwFwRevisions(IntPtr handle, char* hardwareRevision, char* firmwareRevision);
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
@@ -391,5 +391,5 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport(DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
-    public static partial int Mcp2221_SmbusReceiveByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte* readByte);
+    public static unsafe partial int Mcp2221_SmbusReceiveByte(IntPtr handle, byte slaveAddress, byte use7bitAddress, byte usePec, byte* readByte);
 }

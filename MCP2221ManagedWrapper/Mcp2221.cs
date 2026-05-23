@@ -1,5 +1,6 @@
 namespace MCP2221ManagedWrapper;
 
+using System.Runtime.Versioning;
 using static MCP2221ManagedWrapper.NativeMethods;
 
 // ReSharper disable InconsistentNaming
@@ -118,7 +119,8 @@ public sealed class GpioSettings
 #pragma warning restore CA1819
 
 // ReSharper disable InconsistentNaming
-public sealed unsafe class Mcp2221 : IDisposable
+[SupportedOSPlatform("windows")]
+public sealed class Mcp2221 : IDisposable
 {
     public const uint DefaultVid = 0x04D8;
     public const uint DefaultPid = 0x00DD;
@@ -183,7 +185,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public static Mcp2221Status GetConnectedDevices(out uint count)
         => (Mcp2221Status)Mcp2221_GetConnectedDevices(DefaultVid, DefaultPid, out count);
 
-    public static Mcp2221Status GetLibraryVersion(out string version)
+    public static unsafe Mcp2221Status GetLibraryVersion(out string version)
     {
         Span<char> buf = stackalloc char[16];
         buf.Clear();
@@ -202,7 +204,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     // USB descriptors
     //------------------------------------------------------------------------
 
-    public Mcp2221Status GetManufacturerDescriptor(out string manufacturer)
+    public unsafe Mcp2221Status GetManufacturerDescriptor(out string manufacturer)
     {
         Span<char> buf = stackalloc char[32];
         buf.Clear();
@@ -220,7 +222,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetManufacturerDescriptor(string manufacturer)
         => (Mcp2221Status)Mcp2221_SetManufacturerDescriptor(Handle, manufacturer);
 
-    public Mcp2221Status GetProductDescriptor(out string product)
+    public unsafe Mcp2221Status GetProductDescriptor(out string product)
     {
         Span<char> buf = stackalloc char[32];
         buf.Clear();
@@ -238,7 +240,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetProductDescriptor(string product)
         => (Mcp2221Status)Mcp2221_SetProductDescriptor(Handle, product);
 
-    public Mcp2221Status GetSerialNumberDescriptor(out string serial)
+    public unsafe Mcp2221Status GetSerialNumberDescriptor(out string serial)
     {
         Span<char> buf = stackalloc char[32];
         buf.Clear();
@@ -256,7 +258,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetSerialNumberDescriptor(string serial)
         => (Mcp2221Status)Mcp2221_SetSerialNumberDescriptor(Handle, serial);
 
-    public Mcp2221Status GetFactorySerialNumber(out string serial)
+    public unsafe Mcp2221Status GetFactorySerialNumber(out string serial)
     {
         Span<char> buf = stackalloc char[32];
         buf.Clear();
@@ -271,7 +273,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status GetHwFwRevisions(out string hardwareRevision, out string firmwareRevision)
+    public unsafe Mcp2221Status GetHwFwRevisions(out string hardwareRevision, out string firmwareRevision)
     {
         Span<char> hw = stackalloc char[64];
         Span<char> fw = stackalloc char[64];
@@ -335,7 +337,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetSpeed(uint speed)
         => (Mcp2221Status)Mcp2221_SetSpeed(Handle, speed);
 
-    public Mcp2221Status I2cRead(byte slaveAddress, bool use7BitAddress, Span<byte> rx)
+    public unsafe Mcp2221Status I2cRead(byte slaveAddress, bool use7BitAddress, Span<byte> rx)
     {
         fixed (byte* p = rx)
         {
@@ -348,7 +350,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status I2cWrite(byte slaveAddress, bool use7BitAddress, ReadOnlySpan<byte> tx)
+    public unsafe Mcp2221Status I2cWrite(byte slaveAddress, bool use7BitAddress, ReadOnlySpan<byte> tx)
     {
         fixed (byte* p = tx)
         {
@@ -361,7 +363,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status I2cWriteNoStop(byte slaveAddress, bool use7BitAddress, ReadOnlySpan<byte> tx)
+    public unsafe Mcp2221Status I2cWriteNoStop(byte slaveAddress, bool use7BitAddress, ReadOnlySpan<byte> tx)
     {
         fixed (byte* p = tx)
         {
@@ -374,7 +376,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status I2cReadRestart(byte slaveAddress, bool use7BitAddress, Span<byte> rx)
+    public unsafe Mcp2221Status I2cReadRestart(byte slaveAddress, bool use7BitAddress, Span<byte> rx)
     {
         fixed (byte* p = rx)
         {
@@ -387,7 +389,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status I2cWriteRestart(byte slaveAddress, bool use7BitAddress, ReadOnlySpan<byte> tx)
+    public unsafe Mcp2221Status I2cWriteRestart(byte slaveAddress, bool use7BitAddress, ReadOnlySpan<byte> tx)
     {
         fixed (byte* p = tx)
         {
@@ -415,7 +417,7 @@ public sealed unsafe class Mcp2221 : IDisposable
             data);
     }
 
-    public Mcp2221Status SmbusReadByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, out byte readByte)
+    public unsafe Mcp2221Status SmbusReadByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, out byte readByte)
     {
         fixed (byte* p = &readByte)
         {
@@ -429,7 +431,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status SmbusWriteWord(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, ReadOnlySpan<byte> data2Bytes)
+    public unsafe Mcp2221Status SmbusWriteWord(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, ReadOnlySpan<byte> data2Bytes)
     {
         fixed (byte* p = data2Bytes)
         {
@@ -443,7 +445,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status SmbusReadWord(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, Span<byte> read2Bytes)
+    public unsafe Mcp2221Status SmbusReadWord(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, Span<byte> read2Bytes)
     {
         fixed (byte* p = read2Bytes)
         {
@@ -457,7 +459,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status SmbusBlockWrite(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, ReadOnlySpan<byte> data)
+    public unsafe Mcp2221Status SmbusBlockWrite(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, ReadOnlySpan<byte> data)
     {
         fixed (byte* p = data)
         {
@@ -472,7 +474,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status SmbusBlockRead(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, Span<byte> readData)
+    public unsafe Mcp2221Status SmbusBlockRead(byte slaveAddress, bool use7BitAddress, bool usePec, byte command, Span<byte> readData)
     {
         fixed (byte* p = readData)
         {
@@ -487,7 +489,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         }
     }
 
-    public Mcp2221Status SmbusBlockWriteBlockReadProcessCall(
+    public unsafe Mcp2221Status SmbusBlockWriteBlockReadProcessCall(
         byte slaveAddress,
         bool use7BitAddress,
         bool usePec,
@@ -521,7 +523,7 @@ public sealed unsafe class Mcp2221 : IDisposable
             data);
     }
 
-    public Mcp2221Status SmbusReceiveByte(byte slaveAddress, bool use7BitAddress, bool usePec, out byte readByte)
+    public unsafe Mcp2221Status SmbusReceiveByte(byte slaveAddress, bool use7BitAddress, bool usePec, out byte readByte)
     {
         fixed (byte* p = &readByte)
         {
@@ -571,7 +573,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetClockSettings(ValueSource source, DutyCycle dutyCycle, ClockDivider clockDivider)
         => (Mcp2221Status)Mcp2221_SetClockSettings(Handle, (byte)source, (byte)dutyCycle, (byte)clockDivider);
 
-    public Mcp2221Status GetAdcData(out uint value1, out uint value2, out uint value3)
+    public unsafe Mcp2221Status GetAdcData(out uint value1, out uint value2, out uint value3)
     {
         var buffer = stackalloc uint[3];
         var status = (Mcp2221Status)Mcp2221_GetAdcData(Handle, buffer);
@@ -607,7 +609,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     public Mcp2221Status SetDacValue(ValueSource source, byte dacValue)
         => (Mcp2221Status)Mcp2221_SetDacValue(Handle, (byte)source, dacValue);
 
-    public Mcp2221Status GetGpioSettings(ValueSource source, GpioSettings settings)
+    public unsafe Mcp2221Status GetGpioSettings(ValueSource source, GpioSettings settings)
     {
         var functions = stackalloc byte[4];
         var directions = stackalloc byte[4];
@@ -622,7 +624,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return status;
     }
 
-    public Mcp2221Status SetGpioSettings(ValueSource source, GpioSettings settings)
+    public unsafe Mcp2221Status SetGpioSettings(ValueSource source, GpioSettings settings)
     {
         var functions = stackalloc byte[4];
         var directions = stackalloc byte[4];
@@ -636,7 +638,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return (Mcp2221Status)Mcp2221_SetGpioSettings(Handle, (byte)source, functions, directions, modes);
     }
 
-    public Mcp2221Status GetGpioValues(out PinValue value0, out PinValue value1, out PinValue value2, out PinValue value3)
+    public unsafe Mcp2221Status GetGpioValues(out PinValue value0, out PinValue value1, out PinValue value2, out PinValue value3)
     {
         var buffer = stackalloc byte[4];
         var status = (Mcp2221Status)Mcp2221_GetGpioValues(Handle, buffer);
@@ -647,7 +649,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return status;
     }
 
-    public Mcp2221Status SetGpioValues(PinValue value0, PinValue value1, PinValue value2, PinValue value3)
+    public unsafe Mcp2221Status SetGpioValues(PinValue value0, PinValue value1, PinValue value2, PinValue value3)
     {
         var buffer = stackalloc byte[4];
         buffer[0] = (byte)value0;
@@ -686,7 +688,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return SetGpioValues(value0, value1, value2, value3);
     }
 
-    public Mcp2221Status GetGpioDirection(out PinDirection mode0, out PinDirection mode1, out PinDirection mode2, out PinDirection mode3)
+    public unsafe Mcp2221Status GetGpioDirection(out PinDirection mode0, out PinDirection mode1, out PinDirection mode2, out PinDirection mode3)
     {
         var buffer = stackalloc byte[4];
         var status = (Mcp2221Status)Mcp2221_SetGpioDirection(Handle, buffer);
@@ -697,7 +699,7 @@ public sealed unsafe class Mcp2221 : IDisposable
         return status;
     }
 
-    public Mcp2221Status SetGpioDirection(PinDirection mode0, PinDirection mode1, PinDirection mode2, PinDirection mode3)
+    public unsafe Mcp2221Status SetGpioDirection(PinDirection mode0, PinDirection mode1, PinDirection mode2, PinDirection mode3)
     {
         var buffer = stackalloc byte[4];
         buffer[0] = (byte)mode0;
@@ -763,7 +765,7 @@ public sealed unsafe class Mcp2221 : IDisposable
     // Helpers
     //------------------------------------------------------------------------
 
-    private static string CreateStringFromNullTerminated(char* p, int maxChars)
+    private static unsafe string CreateStringFromNullTerminated(char* p, int maxChars)
     {
         var len = 0;
         for (; len < maxChars; len++)
