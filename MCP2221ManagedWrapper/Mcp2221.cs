@@ -126,9 +126,11 @@ public sealed class Mcp2221 : IDisposable
     public const uint DefaultVid = 0x04D8;
     public const uint DefaultPid = 0x00DD;
 
+    private const int DescriptorBufferLength = 32;
+
     public IntPtr Handle { get; private set; }
 
-    public bool IsOpen => Handle != IntPtr.Zero;
+    public bool IsOpen => Handle.ToInt64() > 0;
 
     //------------------------------------------------------------------------
     // Constructor
@@ -171,7 +173,14 @@ public sealed class Mcp2221 : IDisposable
     }
 
     public Mcp2221Status Reset()
-        => (Mcp2221Status)Mcp2221_Reset(Handle);
+    {
+        var status = (Mcp2221Status)Mcp2221_Reset(Handle);
+        if (status == Mcp2221Status.NoError)
+        {
+            Handle = IntPtr.Zero;
+        }
+        return status;
+    }
 
     public static Mcp2221Status CloseAll()
         => (Mcp2221Status)Mcp2221_CloseAll();
@@ -207,7 +216,7 @@ public sealed class Mcp2221 : IDisposable
 
     public unsafe Mcp2221Status GetManufacturerDescriptor(out string manufacturer)
     {
-        Span<char> buf = stackalloc char[32];
+        Span<char> buf = stackalloc char[DescriptorBufferLength];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -225,7 +234,7 @@ public sealed class Mcp2221 : IDisposable
 
     public unsafe Mcp2221Status GetProductDescriptor(out string product)
     {
-        Span<char> buf = stackalloc char[32];
+        Span<char> buf = stackalloc char[DescriptorBufferLength];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -243,7 +252,7 @@ public sealed class Mcp2221 : IDisposable
 
     public unsafe Mcp2221Status GetSerialNumberDescriptor(out string serial)
     {
-        Span<char> buf = stackalloc char[32];
+        Span<char> buf = stackalloc char[DescriptorBufferLength];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -261,7 +270,7 @@ public sealed class Mcp2221 : IDisposable
 
     public unsafe Mcp2221Status GetFactorySerialNumber(out string serial)
     {
-        Span<char> buf = stackalloc char[32];
+        Span<char> buf = stackalloc char[DescriptorBufferLength];
         buf.Clear();
 
         fixed (char* p = buf)
@@ -692,7 +701,7 @@ public sealed class Mcp2221 : IDisposable
     public unsafe Mcp2221Status GetGpioDirection(out PinDirection mode0, out PinDirection mode1, out PinDirection mode2, out PinDirection mode3)
     {
         var buffer = stackalloc byte[4];
-        var status = (Mcp2221Status)Mcp2221_SetGpioDirection(Handle, buffer);
+        var status = (Mcp2221Status)Mcp2221_GetGpioDirection(Handle, buffer);
         mode0 = (PinDirection)buffer[0];
         mode1 = (PinDirection)buffer[1];
         mode2 = (PinDirection)buffer[2];

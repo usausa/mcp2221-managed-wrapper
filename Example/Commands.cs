@@ -32,6 +32,11 @@ public sealed class GpioCommand : ICommandHandler
     public async ValueTask ExecuteAsync(CommandContext context)
     {
         using var device = Mcp2221.OpenByIndex(Index);
+        if (!device.IsOpen)
+        {
+            Console.WriteLine($"Failed to open device at index [{Index}].");
+            return;
+        }
 
         var status = device.SetGpioDirection(PinDirection.Output, PinDirection.Output, PinDirection.Output, PinDirection.Output);
         if (status != Mcp2221Status.NoError)
@@ -72,8 +77,12 @@ public sealed class I2cCommand : ICommandHandler
 
     public async ValueTask ExecuteAsync(CommandContext context)
     {
-        // SHT30 sensor test
         using var device = Mcp2221.OpenByIndex(Index);
+        if (!device.IsOpen)
+        {
+            Console.WriteLine($"Failed to open device at index [{Index}].");
+            return;
+        }
 
         var status = device.SetSpeed(100000);
         if (status != Mcp2221Status.NoError)

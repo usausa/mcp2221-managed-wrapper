@@ -15,6 +15,10 @@ This library provides a managed interface to interact with the MCP2221 USB-to-UA
 using MCP2221ManagedWrapper;
 
 using var device = Mcp2221.OpenByIndex(0);
+if (!device.IsOpen)
+{
+    return;
+}
 
 device.SetGpioDirection(PinDirection.Output, PinDirection.Output, PinDirection.Output, PinDirection.Output);
 
@@ -34,6 +38,10 @@ while (true)
 using MCP2221ManagedWrapper;
 
 using var device = Mcp2221.OpenByIndex(0);
+if (!device.IsOpen)
+{
+    return;
+}
 
 // Initialize
 device.SetSpeed(100000);
