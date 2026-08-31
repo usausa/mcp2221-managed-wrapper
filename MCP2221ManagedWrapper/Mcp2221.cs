@@ -120,6 +120,7 @@ public sealed class GpioSettings
 #pragma warning restore CA1819
 
 // ReSharper disable InconsistentNaming
+// ReSharper disable RedundantUnsafeContext
 [SupportedOSPlatform("windows")]
 public sealed class Mcp2221 : IDisposable
 {
