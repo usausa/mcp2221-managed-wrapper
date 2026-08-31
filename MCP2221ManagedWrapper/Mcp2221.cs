@@ -283,6 +283,7 @@ public sealed class Mcp2221 : IDisposable
         }
     }
 
+#pragma warning disable SA1519
     public unsafe Mcp2221Status GetHwFwRevisions(out string hardwareRevision, out string firmwareRevision)
     {
         Span<char> hw = stackalloc char[64];
@@ -307,6 +308,7 @@ public sealed class Mcp2221 : IDisposable
             return status;
         }
     }
+#pragma warning restore SA1519
 
     //------------------------------------------------------------------------
     // USB attributes
@@ -499,6 +501,7 @@ public sealed class Mcp2221 : IDisposable
         }
     }
 
+#pragma warning disable SA1519
     public unsafe Mcp2221Status SmbusBlockWriteBlockReadProcessCall(
         byte slaveAddress,
         bool use7BitAddress,
@@ -522,6 +525,7 @@ public sealed class Mcp2221 : IDisposable
                 pR);
         }
     }
+#pragma warning restore SA1519
 
     public Mcp2221Status SmbusSendByte(byte slaveAddress, bool use7BitAddress, bool usePec, byte data)
     {
